@@ -1,5 +1,11 @@
 import axios from "axios";
 
+const BASE_URL = "https://github.com";
+
+// github returns em tags in the response
+const stripEm = (text?: string) =>
+    text ? text.replace(/<\/?em>/gi, "") : text;
+
 const GetReactBuilder = async (query: string): Promise<any> => {
     try {
         const page = await axios.get(query, {
@@ -26,9 +32,32 @@ const GetReactBuilder = async (query: string): Promise<any> => {
     }
 };
 
-(async () => {
+const simplifyRepository = (repo: any) => ({
+    id: repo.id,
+    name: stripEm(repo.hl_name),
+    description: stripEm(repo.hl_trunc_description),
+    archived: repo.archived,
+    public: repo.public,
+    stars: repo.repo?.repository?.stargazerCount ?? 0,
+    language: repo.language,
+    topics: repo.topics ?? [],
+});
+
+const SearchRepositories = async (query: string): Promise<any[]> => {
     const data = await GetReactBuilder(
-        "https://github.com/search?q=hello%20neighbor&type=repositories"
+        `${BASE_URL}/search?q=${encodeURIComponent(query)}&type=repositories`
+    );
+
+    if (data?.payload?.results) {
+        return data.payload.results.map(simplifyRepository);
+    }
+
+    return [];
+};
+
+(async () => {
+    const data = await SearchRepositories(
+        "hello neighbor"
     );
     console.log(data);
 })();
