@@ -11,6 +11,8 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
-    "tsc": "^2.0.4"
+    "axios": "^1.13.2",
+    "tsc": "^2.0.4",
+    "typescript": "^5.9.3"
   }
 }
